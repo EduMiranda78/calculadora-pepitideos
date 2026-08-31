@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0e13">
+  <meta name="description" content="Calculadora de reconstituição, concentração e equivalência para seringas U-100.">
+  <title>Calculadora de Doses de Peptídeos</title>
+  <link rel="stylesheet" href="styles.css?v=2">
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <div>
+        <p class="brand-kicker">MIRANDA STACK</p>
+        <h1>Calculadora de Doses de Peptídeos</h1>
+        <p class="subtitle">Reconstituição, concentração e equivalência em seringas U-100.</p>
+      </div>
+      <div class="header-badge">U-100</div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="calculator-layout">
+      <div class="form-column">
+
+        <section class="step-card">
+          <div class="step-title">
+            <span class="step-number">1</span>
+            <div>
+              <h2>Conteúdo do frasco</h2>
+              <p>Informe a quantidade total do frasco, sempre em mg.</p>
+            </div>
+          </div>
+          <div class="chips" id="vialChips"></div>
+          <label class="field hidden" id="vialOtherWrap">
+            <span>Outro valor</span>
+            <div class="input-wrap">
+              <input id="vialOther" inputmode="decimal" autocomplete="off" placeholder="Ex.: 12,5">
+              <b>mg</b>
+            </div>
+          </label>
+        </section>
+
+        <section class="step-card">
+          <div class="step-title">
+            <span class="step-number">2</span>
+            <div>
+              <h2>Volume de diluente</h2>
+              <p>Escolha o volume usado na reconstituição.</p>
+            </div>
+          </div>
+          <div class="chips" id="diluentChips"></div>
+          <label class="field hidden" id="diluentOtherWrap">
+            <span>Outro volume</span>
+            <div class="input-wrap">
+              <input id="diluentOther" inputmode="decimal" autocomplete="off" placeholder="Ex.: 1,8">
+              <b>mL</b>
+            </div>
+          </label>
+          <div class="inline-info" id="liveConcentration">Selecione frasco e diluente para ver a concentração.</div>
+        </section>
+
+        <section class="step-card">
+          <div class="step-title">
+            <span class="step-number">3</span>
+            <div>
+              <h2>Tipo de seringa</h2>
+              <p>As opções abaixo são seringas de insulina U-100.</p>
+            </div>
+          </div>
+
+          <div class="syringe-options" id="syringeOptions"></div>
+
+          <details class="details-box">
+            <summary>Qual é a diferença entre 30, 50 e 100 UI?</summary>
+            <div class="details-content">
+              <div><strong>30 UI</strong><span>capacidade máxima de 0,3 mL</span></div>
+              <div><strong>50 UI</strong><span>capacidade máxima de 0,5 mL</span></div>
+              <div><strong>100 UI</strong><span>capacidade máxima de 1,0 mL</span></div>
+              <p><b>1 UI em uma seringa U-100 = 0,01 mL.</b> A seringa não altera a concentração. O que muda é a capacidade e a escala física.</p>
+            </div>
+          </details>
+        </section>
+
+        <section class="step-card">
+          <div class="step-title">
+            <span class="step-number">4</span>
+            <div>
+              <h2>Dose desejada</h2>
+              <p>Escolha a unidade e informe a quantidade por aplicação.</p>
+            </div>
+          </div>
+
+          <div class="segmented" id="doseUnitSelector">
+            <button class="seg active" data-unit="mg" type="button">mg</button>
+            <button class="seg" data-unit="mcg" type="button">mcg</button>
+            <button class="seg" data-unit="ui" type="button">UI</button>
+          </div>
+
+          <div class="chips dose-chips" id="doseChips"></div>
+
+          <label class="field">
+            <span>Dose desejada</span>
+            <div class="input-wrap">
+              <input id="doseInput" inputmode="decimal" autocomplete="off" placeholder="Ex.: 0,5">
+              <b id="doseSuffix">mg</b>
+            </div>
+          </label>
+        </section>
+      </div>
+
+      <aside class="result-column">
+        <section class="result-card">
+          <div class="result-head">
+            <div>
+              <p class="result-kicker">RESULTADO</p>
+              <h2>Medida na seringa</h2>
+            </div>
+            <span class="status-dot">cálculo em tempo real</span>
+          </div>
+
+          <div id="resultEmpty" class="result-empty">
+            Preencha os quatro passos para visualizar a medida.
+          </div>
+
+          <div id="resultContent" class="hidden">
+            <div class="pull-block">
+              <span>PUXE ATÉ</span>
+              <div><strong id="resultUi">0</strong><b>UI</b></div>
+            </div>
+
+            <div id="capacityAlert" class="alert hidden"></div>
+
+            <div class="equivalents">
+              <div><span>Volume</span><strong><b id="resultMl">0</b> mL</strong></div>
+              <div><span>Dose</span><strong><b id="resultMg">0</b> mg</strong></div>
+              <div><span>Equivalente</span><strong><b id="resultMcg">0</b> mcg</strong></div>
+            </div>
+
+            <section class="syringe-panel" aria-label="Escala visual da seringa">
+              <div class="syringe-panel-head">
+                <span>Seringa selecionada</span>
+                <strong id="syringeTitle">30 UI · 0,3 mL</strong>
+              </div>
+
+              <div class="syringe-body">
+                <div class="barrel">
+                  <div class="liquid" id="syringeFill"></div>
+                  <div class="dose-line" id="doseMarker"><span id="doseMarkerLabel">0 UI</span></div>
+                  <div class="scale-layer" id="ticks"></div>
+                </div>
+                <div class="needle"></div>
+              </div>
+
+              <div class="scale-caption">Os números abaixo correspondem à graduação da seringa em UI.</div>
+            </section>
+
+            <div class="metrics">
+              <div>
+                <span>Concentração</span>
+                <strong id="concentrationMg">0 mg/mL</strong>
+                <small id="concentrationMcg">0 mcg/mL</small>
+              </div>
+              <div>
+                <span>Doses no frasco</span>
+                <strong id="doseCount">0</strong>
+                <small>aproximadamente</small>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="explain-card">
+          <div class="section-label">ENTENDA RÁPIDO</div>
+          <div id="quickExplain">
+            <p><strong>10 UI</strong> em uma seringa U-100 sempre correspondem a <strong>0,1 mL</strong>.</p>
+            <p>O que determina quantos mg existem nesse volume é a concentração da solução.</p>
+          </div>
+        </section>
+
+        <section class="actions">
+          <button id="copyBtn" class="btn btn-primary" type="button">Copiar resultado</button>
+          <button id="whatsappBtn" class="btn btn-whatsapp" type="button">Compartilhar no WhatsApp</button>
+          <button id="clearBtn" class="btn btn-secondary" type="button">Limpar campos</button>
+        </section>
+
+        <section class="history-card">
+          <div class="history-head">
+            <div>
+              <span class="section-label">HISTÓRICO</span>
+              <h2>Últimos cálculos</h2>
+            </div>
+            <button id="clearHistoryBtn" class="text-button" type="button">Limpar</button>
+          </div>
+          <div id="historyList" class="history-list"></div>
+        </section>
+      </aside>
+    </section>
+
+    <footer class="site-footer">
+      <div class="footer-notice">
+        <span class="footer-icon">i</span>
+        <div>
+          <strong>Uso informativo.</strong>
+          <p>Os resultados são cálculos matemáticos e não substituem orientação médica ou farmacêutica. Confirme o preparo e a administração com profissional habilitado.</p>
+        </div>
+      </div>
+      <p class="footer-brand">Calculadora de Doses de Peptídeos · Miranda Stack</p>
+    </footer>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js?v=2"></script>
+</body>
+</html>
